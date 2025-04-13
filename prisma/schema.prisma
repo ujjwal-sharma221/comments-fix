@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Comments {
+  id        String     @id @default(uuid())
+  comment   String
+  parentId  String?
+  parent    Comments?  @relation("Replies", fields: [parentId], references: [id])
+  replies   Comments[] @relation("Replies")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now())
+
+  @@unique([createdAt, id])
+  @@unique([parentId, createdAt, id])
+  @@index([parentId])
+}
